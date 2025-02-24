@@ -1,0 +1,231 @@
+-- Create GUI
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TitleLabel = Instance.new("TextLabel")
+local Button = Instance.new("TextButton")
+local TextLabel = Instance.new("TextLabel")
+local SpeedSliderLabel = Instance.new("TextLabel")
+local SpeedSlider = Instance.new("Frame") -- Making it a frame to simulate a slider bar
+local SliderButton = Instance.new("TextButton")
+local SpectateButton = Instance.new("TextButton")
+local InfiniteHPButton = Instance.new("TextButton")
+local SpeedToggleButton = Instance.new("TextButton")  -- Toggle speed button
+local PlayerNameTextBox = Instance.new("TextBox")  -- TextBox for user name input
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.Name = "VisualEffectsGui"
+
+Frame.Parent = ScreenGui
+Frame.Size = UDim2.new(0, 400, 0, 400)  -- Increased width and height for more elements
+Frame.Position = UDim2.new(0.5, -125, 0.5, -125)  -- Center the frame
+Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Frame.BorderSizePixel = 0
+Frame.Visible = false  -- Hide the GUI initially
+
+-- Title Label
+TitleLabel.Parent = Frame
+TitleLabel.Size = UDim2.new(0, 230, 0, 30)
+TitleLabel.Position = UDim2.new(0, 10, 0, 10)
+TitleLabel.Text = "Obscur3_V1"
+TitleLabel.TextSize = 20
+TitleLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
+TitleLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+
+Button.Parent = Frame
+Button.Size = UDim2.new(0, 230, 0, 40)
+Button.Position = UDim2.new(0, 10, 0, 50)
+Button.Text = "Toggle Visual Effects"
+Button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+
+TextLabel.Parent = Frame
+TextLabel.Size = UDim2.new(0, 230, 0, 20)
+TextLabel.Position = UDim2.new(0, 10, 0, 90)
+TextLabel.Text = "Effects: OFF"
+TextLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
+TextLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+
+SpeedSliderLabel.Parent = Frame
+SpeedSliderLabel.Size = UDim2.new(0, 230, 0, 20)
+SpeedSliderLabel.Position = UDim2.new(0, 10, 0, 120)
+SpeedSliderLabel.Text = "Speed: 16"
+SpeedSliderLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+SpeedSliderLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+
+SpeedSlider.Parent = Frame
+SpeedSlider.Size = UDim2.new(0, 230, 0, 10)
+SpeedSlider.Position = UDim2.new(0, 10, 0, 150)
+SpeedSlider.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+
+SliderButton.Parent = SpeedSlider
+SliderButton.Size = UDim2.new(0, 10, 0, 20)
+SliderButton.Position = UDim2.new(0, 0, 0, -5)  -- Place the button on the slider to simulate interaction
+SliderButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+SliderButton.Text = "Speed"
+
+-- New buttons for spectate and infinite HP
+SpectateButton.Parent = Frame
+SpectateButton.Size = UDim2.new(0, 230, 0, 40)
+SpectateButton.Position = UDim2.new(0, 10, 0, 270)
+SpectateButton.Text = "Spectate Player"
+SpectateButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+
+InfiniteHPButton.Parent = Frame
+InfiniteHPButton.Size = UDim2.new(0, 230, 0, 40)
+InfiniteHPButton.Position = UDim2.new(0, 10, 0, 220)
+InfiniteHPButton.Text = "Toggle Infinite HP"
+InfiniteHPButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+
+SpeedToggleButton.Parent = Frame
+SpeedToggleButton.Size = UDim2.new(0, 230, 0, 40)
+SpeedToggleButton.Position = UDim2.new(0, 10, 0, 160)
+SpeedToggleButton.Text = "Toggle Speed"
+SpeedToggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+
+PlayerNameTextBox.Parent = Frame
+PlayerNameTextBox.Size = UDim2.new(0, 230, 0, 30)
+PlayerNameTextBox.Position = UDim2.new(0, 10, 0, 320)
+PlayerNameTextBox.PlaceholderText = "Enter Username"
+PlayerNameTextBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+
+-- Variables to control visual effects
+local lighting = game:GetService("Lighting")
+local workspace = game:GetService("Workspace")
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local isEffectsEnabled = false
+local isDragging = false
+local movementEnabled = false
+local currentSpeed = 16
+local isSpectating = false
+local spectatingPlayer = nil
+local originalHealth = nil
+local isInfiniteHPEnabled = false
+local isSpeedEnabled = false  -- Speed toggle state
+
+-- Function to toggle the visual effects
+local function toggleVisualEffects()
+    isEffectsEnabled = not isEffectsEnabled
+    TextLabel.Text = isEffectsEnabled and "Effects: ON" or "Effects: OFF"
+    
+    if isEffectsEnabled then
+        lighting.FogStart = 100000
+        lighting.FogEnd = math.huge
+        lighting.FogColor = Color3.fromRGB(255, 255, 255)
+        lighting.Brightness = 2
+        lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
+        lighting.Ambient = Color3.fromRGB(255, 255, 255)
+    else
+        lighting.FogStart = 0
+        lighting.FogEnd = 100000
+        lighting.FogColor = Color3.fromRGB(189, 189, 189)
+        lighting.Brightness = 1
+        lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+        lighting.Ambient = Color3.fromRGB(128, 128, 128)
+    end
+end
+
+Button.MouseButton1Click:Connect(toggleVisualEffects)
+
+-- Slider functionality for speed
+SliderButton.MouseButton1Down:Connect(function()
+    isDragging = true
+    local sliderStartX = SpeedSlider.AbsolutePosition.X
+    local sliderWidth = SpeedSlider.AbsoluteSize.X
+
+    local moveConnection
+    local releaseConnection
+
+    moveConnection = game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement and isDragging then
+            local mouseX = input.Position.X
+            local newX = math.clamp(mouseX - sliderStartX, 0, sliderWidth - SliderButton.AbsoluteSize.X)
+            SliderButton.Position = UDim2.new(0, newX, 0, -5)
+
+            -- Convert slider position to speed (mapping range from 16 to 100)
+            local speedPercent = newX / (sliderWidth - SliderButton.AbsoluteSize.X)
+            currentSpeed = 16 + (speedPercent * (200 - 16))
+            SpeedSliderLabel.Text = "Speed: " .. math.floor(currentSpeed)
+        end
+    end)
+
+    releaseConnection = game:GetService("UserInputService").InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isDragging = false
+            moveConnection:Disconnect()
+            releaseConnection:Disconnect()
+        end
+    end)
+end)
+
+-- Movement control and GUI toggle with LeftAlt
+local userInputService = game:GetService("UserInputService")
+
+userInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed then
+        -- Check if the LeftAlt key was pressed
+        if input.KeyCode == Enum.KeyCode.LeftAlt then
+            Frame.Visible = not Frame.Visible -- Toggle the visibility of the GUI
+        elseif input.KeyCode == Enum.KeyCode.W then
+            movementEnabled = true
+        end
+    end
+end)
+
+userInputService.InputEnded:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.W then
+        movementEnabled = false
+    end
+end)
+
+-- Movement loop for character
+game:GetService("RunService").RenderStepped:Connect(function()
+    if movementEnabled and isSpeedEnabled then
+        humanoidRootPart.CFrame = humanoidRootPart.CFrame + humanoidRootPart.CFrame.LookVector * (currentSpeed / 50)
+    end
+end)
+
+-- Toggle Speed
+SpeedToggleButton.MouseButton1Click:Connect(function()
+    isSpeedEnabled = not isSpeedEnabled
+    SpeedToggleButton.Text = isSpeedEnabled and "Speed: ON" or "Speed: OFF"
+end)
+
+-- Spectate function
+SpectateButton.MouseButton1Click:Connect(function()
+    if isSpectating then
+        isSpectating = false
+        spectatingPlayer = nil
+        workspace.CurrentCamera.CameraSubject = player.Character.Humanoid
+        print("Stopped spectating.")
+    else
+        isSpectating = true
+        local targetPlayerName = PlayerNameTextBox.Text  -- Get name from the text box
+        local targetPlayer = game.Players:FindFirstChild(targetPlayerName)
+        
+        if targetPlayer then
+            spectatingPlayer = targetPlayer
+            workspace.CurrentCamera.CameraSubject = targetPlayer.Character.Humanoid
+            print("Started spectating " .. targetPlayerName)
+        else
+            print("Player not found")
+        end
+    end
+end)
+
+-- Infinite HP toggle
+InfiniteHPButton.MouseButton1Click:Connect(function()
+    isInfiniteHPEnabled = not isInfiniteHPEnabled
+    InfiniteHPButton.Text = isInfiniteHPEnabled and "Infinite HP: ON" or "Infinite HP: OFF"
+    
+    if isInfiniteHPEnabled then
+        originalHealth = player.Character.Humanoid.Health
+        player.Character.Humanoid.HealthChanged:Connect(function()
+            if player.Character.Humanoid.Health < originalHealth then
+                player.Character.Humanoid.Health = originalHealth
+            end
+        end)
+    else
+        originalHealth = nil
+    end
+end)
