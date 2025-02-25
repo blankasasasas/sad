@@ -1,4 +1,4 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Rayfield = loadstring(game:HttpGet('https://[Log in to view URL]'))()
 
 local Window = Rayfield:CreateWindow({
    Name = "RuneSlayer",
@@ -524,7 +524,7 @@ local Button = VisualTab:CreateButton({
    Name = "FullBright",
    Callback = function()
 --just made a loadstring for my discord server, so i not made thi
---https://discord.gg/7axk7UGS8C
+--https://[Log in to view URL]
 
 
 pcall(function()
@@ -564,7 +564,7 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
-local Maid = loadstring(game:HttpGet('https://raw.githubusercontent.com/Quenty/NevermoreEngine/main/src/maid/src/Shared/Maid.lua'))()
+local Maid = loadstring(game:HttpGet('https://[Log in to view URL]'))()
 
 shared.Maid = shared.Maid or Maid.new(); local Maid = shared.Maid; Maid:DoCleaning()
 shared.Active = true
@@ -743,3 +743,17 @@ end))
 
    end,
 })
+
+local Button = MainTab:CreateButton({
+   Name = "Reset Press L",
+   Callback = function()
+local LocalP = game.Players.LocalPlayer
+local Mouse = LocalP:GetMouse()
+
+Mouse.KeyDown:Connect(function(key)
+    if key == "l" then
+        LocalP.Character.Torso:Destroy()
+    end
+end)
+   end,
+})                                          
