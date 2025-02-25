@@ -1,231 +1,558 @@
--- Create GUI
-local ScreenGui = Instance.new("ScreenGui")
-local Frame = Instance.new("Frame")
-local TitleLabel = Instance.new("TextLabel")
-local Button = Instance.new("TextButton")
-local TextLabel = Instance.new("TextLabel")
-local SpeedSliderLabel = Instance.new("TextLabel")
-local SpeedSlider = Instance.new("Frame") -- Making it a frame to simulate a slider bar
-local SliderButton = Instance.new("TextButton")
-local SpectateButton = Instance.new("TextButton")
-local InfiniteHPButton = Instance.new("TextButton")
-local SpeedToggleButton = Instance.new("TextButton")  -- Toggle speed button
-local PlayerNameTextBox = Instance.new("TextBox")  -- TextBox for user name input
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-ScreenGui.Name = "VisualEffectsGui"
+local Window = Rayfield:CreateWindow({
+   Name = "RuneSlayer",
+   Icon = 0,
+   LoadingTitle = "RuneSlayerHub",
+   LoadingSubtitle = "by Obscur3_",
+   Theme = "Default",
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = nil,
+      FileName = "RuneSlayerHub"
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "noinvitelink",
+      RememberJoins = true
+   },
+   KeySystem = true,
+   KeySettings = {
+      Title = "Key System",
+      Subtitle = "Imthasigma",
+      Note = "Have Fun!",
+      FileName = "Key",
+      SaveKey = true,
+      GrabKeyFromSite = false,
+      Key = {"Imthasigma"}
+   }
+})
 
-Frame.Parent = ScreenGui
-Frame.Size = UDim2.new(0, 400, 0, 400)  -- Increased width and height for more elements
-Frame.Position = UDim2.new(0.5, -125, 0.5, -125)  -- Center the frame
-Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-Frame.BorderSizePixel = 0
-Frame.Visible = false  -- Hide the GUI initially
+local MainTab = Window:CreateTab("Main👍", nil)
+local MainSection = MainTab:CreateSection("Main")
 
--- Title Label
-TitleLabel.Parent = Frame
-TitleLabel.Size = UDim2.new(0, 230, 0, 30)
-TitleLabel.Position = UDim2.new(0, 10, 0, 10)
-TitleLabel.Text = "Obscur3_V1"
-TitleLabel.TextSize = 20
-TitleLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
-TitleLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Rayfield:Notify({
+   Title = "You Used My Script!",
+   Content = "yay!",
+   Duration = 5,
+   Image = nil,
+})
 
-Button.Parent = Frame
-Button.Size = UDim2.new(0, 230, 0, 40)
-Button.Position = UDim2.new(0, 10, 0, 50)
-Button.Text = "Toggle Visual Effects"
-Button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+local Button = MainTab:CreateButton({
+   Name = "Infinite Jump",
+   Callback = function()
+      _G.infinjump = not _G.infinjump
+      if _G.infinJumpStarted == nil then
+         _G.infinJumpStarted = true
+         game.StarterGui:SetCore("SendNotification", {Title="Xakson Hub"; Text="The Xakson Hub Infinite Jump is ready!"; Duration=5;})
+         local plr = game:GetService('Players').LocalPlayer
+         local m = plr:GetMouse()
+         m.KeyDown:connect(function(k)
+            if _G.infinjump then
+               if k:byte() == 32 then
+                  humanoid = plr.Character:FindFirstChildOfClass('Humanoid')
+                  humanoid:ChangeState('Jumping')
+                  wait()
+                  humanoid:ChangeState('Seated')
+               end
+            end
+         end)
+      end
+   end,
+})
 
-TextLabel.Parent = Frame
-TextLabel.Size = UDim2.new(0, 230, 0, 20)
-TextLabel.Position = UDim2.new(0, 10, 0, 90)
-TextLabel.Text = "Effects: OFF"
-TextLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
-TextLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+-- Variable to store walk speed value and toggle state
+local currentWalkSpeed = 16
+local isSpeedEnabled = false
 
-SpeedSliderLabel.Parent = Frame
-SpeedSliderLabel.Size = UDim2.new(0, 230, 0, 20)
-SpeedSliderLabel.Position = UDim2.new(0, 10, 0, 120)
-SpeedSliderLabel.Text = "Speed: 16"
-SpeedSliderLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
-SpeedSliderLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+local Slider = MainTab:CreateSlider({
+   Name = "WalkSpeed",
+   Range = {0, 200},
+   Increment = 1,
+   Suffix = "Speed",
+   CurrentValue = currentWalkSpeed,
+   Flag = "Slider1",
+   Callback = function(Value)
+      currentWalkSpeed = Value  -- Update the walk speed when slider is changed
+   end,
+})
 
-SpeedSlider.Parent = Frame
-SpeedSlider.Size = UDim2.new(0, 230, 0, 10)
-SpeedSlider.Position = UDim2.new(0, 10, 0, 150)
-SpeedSlider.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+-- Toggle speed functionality
+local ToggleSpeedButton = MainTab:CreateButton({
+   Name = "Toggle Speed",
+   Callback = function()
+      isSpeedEnabled = not isSpeedEnabled
+      if isSpeedEnabled then
+         game.StarterGui:SetCore("SendNotification", {Title="Speed Enabled"; Text="Movement Speed has been enabled"; Duration=5;})
+      else
+         game.StarterGui:SetCore("SendNotification", {Title="Speed Disabled"; Text="Movement Speed has been disabled"; Duration=5;})
+      end
+   end,
+})
 
-SliderButton.Parent = SpeedSlider
-SliderButton.Size = UDim2.new(0, 10, 0, 20)
-SliderButton.Position = UDim2.new(0, 0, 0, -5)  -- Place the button on the slider to simulate interaction
-SliderButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-SliderButton.Text = "Speed"
+-- Handle WASD movement with speed enabled
+game:GetService("RunService").RenderStepped:Connect(function()
+   local player = game.Players.LocalPlayer
+   if player and player.Character then
+      local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+      local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
 
--- New buttons for spectate and infinite HP
-SpectateButton.Parent = Frame
-SpectateButton.Size = UDim2.new(0, 230, 0, 40)
-SpectateButton.Position = UDim2.new(0, 10, 0, 270)
-SpectateButton.Text = "Spectate Player"
-SpectateButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+      -- Ensure we have the humanoidRootPart
+      if humanoidRootPart then
+         -- If speed is disabled, allow normal walk speed
+         if not isSpeedEnabled then
+            humanoid.WalkSpeed = 16
+         else
+            humanoid.WalkSpeed = currentWalkSpeed
+         end
 
-InfiniteHPButton.Parent = Frame
-InfiniteHPButton.Size = UDim2.new(0, 230, 0, 40)
-InfiniteHPButton.Position = UDim2.new(0, 10, 0, 220)
-InfiniteHPButton.Text = "Toggle Infinite HP"
-InfiniteHPButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+         -- Move the character with WASD
+         if isSpeedEnabled then
+            local direction = Vector3.new(0, 0, 0)
 
-SpeedToggleButton.Parent = Frame
-SpeedToggleButton.Size = UDim2.new(0, 230, 0, 40)
-SpeedToggleButton.Position = UDim2.new(0, 10, 0, 160)
-SpeedToggleButton.Text = "Toggle Speed"
-SpeedToggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            -- Detect W, A, S, D keys for movement direction
+            if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.W) then
+               direction = humanoidRootPart.CFrame.LookVector
+            elseif game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.S) then
+               direction = -humanoidRootPart.CFrame.LookVector
+            elseif game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.A) then
+               direction = -humanoidRootPart.CFrame.RightVector
+            elseif game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.D) then
+               direction = humanoidRootPart.CFrame.RightVector
+            end
 
-PlayerNameTextBox.Parent = Frame
-PlayerNameTextBox.Size = UDim2.new(0, 230, 0, 30)
-PlayerNameTextBox.Position = UDim2.new(0, 10, 0, 320)
-PlayerNameTextBox.PlaceholderText = "Enter Username"
-PlayerNameTextBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            -- Move using CFrame with a speed adjustment
+            humanoidRootPart.CFrame = humanoidRootPart.CFrame + direction * (currentWalkSpeed / 50)
+         end
+      end
+   end
+end)
 
--- Variables to control visual effects
-local lighting = game:GetService("Lighting")
-local workspace = game:GetService("Workspace")
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-local isEffectsEnabled = false
-local isDragging = false
-local movementEnabled = false
-local currentSpeed = 16
-local isSpectating = false
-local spectatingPlayer = nil
-local originalHealth = nil
-local isInfiniteHPEnabled = false
-local isSpeedEnabled = false  -- Speed toggle state
+local Button = MainTab:CreateButton({
+   Name = "Spectate",
+   Callback = function()
+-- Services
+local Players = game:GetService("Players")
+local Camera = game.Workspace.CurrentCamera
 
--- Function to toggle the visual effects
-local function toggleVisualEffects()
-    isEffectsEnabled = not isEffectsEnabled
-    TextLabel.Text = isEffectsEnabled and "Effects: ON" or "Effects: OFF"
-    
-    if isEffectsEnabled then
-        lighting.FogStart = 100000
-        lighting.FogEnd = math.huge
-        lighting.FogColor = Color3.fromRGB(255, 255, 255)
-        lighting.Brightness = 2
-        lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
-        lighting.Ambient = Color3.fromRGB(255, 255, 255)
-    else
-        lighting.FogStart = 0
-        lighting.FogEnd = 100000
-        lighting.FogColor = Color3.fromRGB(189, 189, 189)
-        lighting.Brightness = 1
-        lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
-        lighting.Ambient = Color3.fromRGB(128, 128, 128)
+-- Create a ScreenGui for the UI
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SpectateUI"
+screenGui.Parent = playerGui
+
+-- Create a draggable frame for the player list
+local dragFrame = Instance.new("Frame")
+dragFrame.Size = UDim2.new(0, 200, 0, 300)
+dragFrame.Position = UDim2.new(0, 10, 0, 180)
+dragFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+dragFrame.BorderSizePixel = 0
+dragFrame.Parent = screenGui
+
+-- Create a scrolling frame inside the draggable frame
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(1, 0, 1, 0)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.BorderSizePixel = 0
+scrollFrame.ScrollBarThickness = 12
+scrollFrame.Parent = dragFrame
+
+-- Add UIListLayout to handle scrolling
+local listLayout = Instance.new("UIListLayout")
+listLayout.Parent = scrollFrame
+
+-- Function to make the frame draggable
+local dragging
+local dragStartOffset
+dragFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStartOffset = input.Position - dragFrame.Position
+        input.UserInputState = Enum.UserInputState.Begin
+    end
+end)
+
+dragFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        local newPosition = input.Position - dragStartOffset
+        dragFrame.Position = UDim2.new(0, newPosition.X, 0, newPosition.Y)
+    end
+end)
+
+dragFrame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+        input.UserInputState = Enum.UserInputState.End
+    end
+end)
+
+-- Function to create the "Back to Me" button at the top
+local function createBackButton()
+    local backButtonFrame = Instance.new("Frame")
+    backButtonFrame.Size = UDim2.new(0, 150, 0, 30)
+    backButtonFrame.BackgroundTransparency = 1
+    backButtonFrame.Parent = scrollFrame
+
+    local backButton = Instance.new("TextButton")
+    backButton.Size = UDim2.new(1, 0, 1, 0)
+    backButton.BackgroundColor3 = Color3.new(0, 0, 0)
+    backButton.BorderSizePixel = 0
+    backButton.Text = "Back to Me"
+    backButton.TextColor3 = Color3.new(1, 1, 1)
+    backButton.Parent = backButtonFrame
+
+    -- Event listener for the "Back to Me" button click
+    backButton.MouseButton1Click:Connect(function()
+        -- Handle the "Back to Me" button click
+        Camera.CameraSubject = player.Character:WaitForChild("Humanoid")
+    end)
+end
+
+-- Function to create the "Panic" button
+local function createPanicButton()
+    local panicButtonFrame = Instance.new("Frame")
+    panicButtonFrame.Size = UDim2.new(0, 150, 0, 30)
+    panicButtonFrame.BackgroundTransparency = 1
+    panicButtonFrame.Parent = scrollFrame
+
+    local panicButton = Instance.new("TextButton")
+    panicButton.Size = UDim2.new(1, 0, 1, 0)
+    panicButton.BackgroundColor3 = Color3.new(0, 0, 0)
+    panicButton.BorderSizePixel = 0
+    panicButton.Text = "Panic!"
+    panicButton.TextColor3 = Color3.new(1, 1, 1)
+    panicButton.Parent = panicButtonFrame
+
+    -- Event listener for the "Panic" button click
+    panicButton.MouseButton1Click:Connect(function()
+        -- Handle the "Panic" button click
+        Camera.CameraSubject = player.Character:WaitForChild("Humanoid")
+        screenGui:Destroy()
+    end)
+end
+
+-- Function to create a button for spectating a player
+local function createSpectateButton(targetPlayer, isBackButton)
+    local buttonFrame = Instance.new("Frame")
+    buttonFrame.Size = UDim2.new(0, isBackButton and 1.5 * 150 or 150, 0, 1.5 * 30)
+    buttonFrame.BackgroundTransparency = 1
+    buttonFrame.Parent = scrollFrame
+
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, 0, 1, 0)
+    button.BackgroundColor3 = Color3.new(0, 0, 0)
+    button.BorderSizePixel = 0
+    button.Text = isBackButton and "Back" or "Spectate " .. targetPlayer.Name
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.Parent = buttonFrame
+
+    -- Event listener for the button click
+    button.MouseButton1Click:Connect(function()
+        if isBackButton then
+            -- Handle the "Back" button click
+            Camera.CameraSubject = player.Character:WaitForChild("Humanoid")
+        else
+            -- Handle the "Spectate" button click
+            Camera.CameraSubject = targetPlayer.Character:WaitForChild("Humanoid")
+        end
+    end)
+end
+
+-- Function to create spectate buttons for all players
+local function createSpectateButtons()
+    -- Add the "Back to Me" button at the top
+    createBackButton()
+
+    -- Add the "Panic" button below the "Back to Me" button
+    createPanicButton()
+
+    -- Add buttons for other players
+    for _, otherPlayer in ipairs(Players:GetPlayers()) do
+        if otherPlayer ~= player then
+            createSpectateButton(otherPlayer, false)
+        end
     end
 end
 
-Button.MouseButton1Click:Connect(toggleVisualEffects)
-
--- Slider functionality for speed
-SliderButton.MouseButton1Down:Connect(function()
-    isDragging = true
-    local sliderStartX = SpeedSlider.AbsolutePosition.X
-    local sliderWidth = SpeedSlider.AbsoluteSize.X
-
-    local moveConnection
-    local releaseConnection
-
-    moveConnection = game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement and isDragging then
-            local mouseX = input.Position.X
-            local newX = math.clamp(mouseX - sliderStartX, 0, sliderWidth - SliderButton.AbsoluteSize.X)
-            SliderButton.Position = UDim2.new(0, newX, 0, -5)
-
-            -- Convert slider position to speed (mapping range from 16 to 100)
-            local speedPercent = newX / (sliderWidth - SliderButton.AbsoluteSize.X)
-            currentSpeed = 16 + (speedPercent * (200 - 16))
-            SpeedSliderLabel.Text = "Speed: " .. math.floor(currentSpeed)
-        end
-    end)
-
-    releaseConnection = game:GetService("UserInputService").InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            isDragging = false
-            moveConnection:Disconnect()
-            releaseConnection:Disconnect()
-        end
-    end)
-end)
-
--- Movement control and GUI toggle with LeftAlt
-local userInputService = game:GetService("UserInputService")
-
-userInputService.InputBegan:Connect(function(input, gameProcessed)
-    if not gameProcessed then
-        -- Check if the LeftAlt key was pressed
-        if input.KeyCode == Enum.KeyCode.LeftAlt then
-            Frame.Visible = not Frame.Visible -- Toggle the visibility of the GUI
-        elseif input.KeyCode == Enum.KeyCode.W then
-            movementEnabled = true
-        end
+-- Event listener for new players joining
+Players.PlayerAdded:Connect(function(otherPlayer)
+    if otherPlayer ~= player then
+        createSpectateButton(otherPlayer, false)
     end
 end)
 
-userInputService.InputEnded:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.W then
-        movementEnabled = false
+-- Event listener for players leaving
+Players.PlayerRemoving:Connect(function(otherPlayer)
+    local spectateButton = scrollFrame:FindFirstChild("SpectateButton_" .. otherPlayer.UserId)
+    if spectateButton then
+        spectateButton:Destroy()
     end
 end)
 
--- Movement loop for character
-game:GetService("RunService").RenderStepped:Connect(function()
-    if movementEnabled and isSpeedEnabled then
-        humanoidRootPart.CFrame = humanoidRootPart.CFrame + humanoidRootPart.CFrame.LookVector * (currentSpeed / 50)
-    end
-end)
+-- Create initial spectate buttons
+createSpectateButtons()
+   end,
+})
 
--- Toggle Speed
-SpeedToggleButton.MouseButton1Click:Connect(function()
-    isSpeedEnabled = not isSpeedEnabled
-    SpeedToggleButton.Text = isSpeedEnabled and "Speed: ON" or "Speed: OFF"
-end)
+local Button = MainTab:CreateButton({
+   Name = "Esp",
+   Callback = function()
+local FillColor = Color3.fromRGB(175,25,255)
+local DepthMode = "AlwaysOnTop"
+local FillTransparency = 0
+local OutlineColor = Color3.fromRGB(255,255,255)
+local OutlineTransparency = 0
 
--- Spectate function
-SpectateButton.MouseButton1Click:Connect(function()
-    if isSpectating then
-        isSpectating = false
-        spectatingPlayer = nil
-        workspace.CurrentCamera.CameraSubject = player.Character.Humanoid
-        print("Stopped spectating.")
-    else
-        isSpectating = true
-        local targetPlayerName = PlayerNameTextBox.Text  -- Get name from the text box
-        local targetPlayer = game.Players:FindFirstChild(targetPlayerName)
-        
-        if targetPlayer then
-            spectatingPlayer = targetPlayer
-            workspace.CurrentCamera.CameraSubject = targetPlayer.Character.Humanoid
-            print("Started spectating " .. targetPlayerName)
-        else
-            print("Player not found")
-        end
-    end
-end)
+local CoreGui = game:FindService("CoreGui")
+local Players = game:FindService("Players")
+local lp = Players.LocalPlayer
+local connections = {}
 
--- Infinite HP toggle
-InfiniteHPButton.MouseButton1Click:Connect(function()
-    isInfiniteHPEnabled = not isInfiniteHPEnabled
-    InfiniteHPButton.Text = isInfiniteHPEnabled and "Infinite HP: ON" or "Infinite HP: OFF"
+local Storage = Instance.new("Folder")
+Storage.Parent = CoreGui
+Storage.Name = "Highlight_Storage"
+
+local function Highlight(plr)
+    local Highlight = Instance.new("Highlight")
+    Highlight.Name = plr.Name
+    Highlight.FillColor = FillColor
+    Highlight.DepthMode = DepthMode
+    Highlight.FillTransparency = FillTransparency
+    Highlight.OutlineColor = OutlineColor
+    Highlight.OutlineTransparency = 0
+    Highlight.Parent = Storage
     
-    if isInfiniteHPEnabled then
-        originalHealth = player.Character.Humanoid.Health
-        player.Character.Humanoid.HealthChanged:Connect(function()
-            if player.Character.Humanoid.Health < originalHealth then
-                player.Character.Humanoid.Health = originalHealth
-            end
-        end)
-    else
-        originalHealth = nil
+    local plrchar = plr.Character
+    if plrchar then
+        if plr ~= game.Players.LocalPlayer then
+        Highlight.Adornee = plrchar
+    end
+end
+
+    connections[plr] = plr.CharacterAdded:Connect(function(char)
+        Highlight.Adornee = char
+    end)
+end
+
+Players.PlayerAdded:Connect(Highlight)
+for i,v in next, Players:GetPlayers() do
+    if v ~= game.Players.LocalPlayer then
+    Highlight(v)
+end
+end
+
+Players.PlayerRemoving:Connect(function(plr)
+    local plrname = plr.Name
+    if Storage[plrname] then
+        Storage[plrname]:Destroy()
+    end
+    if connections[plr] then
+        connections[plr]:Disconnect()
     end
 end)
+
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+--//Toggle\\--
+getgenv().Toggle = true -- This toggles the esp, turning it to false will turn it off
+getgenv().TC = false -- This toggles team check, turning it on will turn on team check
+local PlayerName = "Name" -- You can decide if you want the Player's name to be a display name which is "DisplayName", or username which is "Name"
+ 
+--//Variables\\--
+local P = game:GetService("Players")
+local LP = P.LocalPlayer
+ 
+--//Debounce\\--
+local DB = false
+ 
+--//Loop\\--
+while task.wait() do
+	if not getgenv().Toggle then
+		break
+	end
+	if DB then 
+		return 
+	end
+	DB = true
+ 
+	pcall(function()
+		for i,v in pairs(P:GetChildren()) do
+			if v:IsA("Player") then
+				if v ~= LP then
+					if v.Character then
+ 
+						local pos = math.floor(((LP.Character:FindFirstChild("HumanoidRootPart")).Position - (v.Character:FindFirstChild("HumanoidRootPart")).Position).magnitude)
+						-- Credits to Infinite Yield for this part (pos) ^^^^^^
+ 
+						if v.Character:FindFirstChild("Totally NOT Esp") == nil and v.Character:FindFirstChild("Icon") == nil and getgenv().TC == false then
+ 
+							--//ESP-Text\\--
+							local Icon = Instance.new("BillboardGui", v.Character.HumanoidRootPart)
+							local ESPText = Instance.new("TextLabel")
+ 
+							Icon.Name = "Icon"
+							Icon.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+							Icon.Active = true
+							Icon.AlwaysOnTop = true
+							Icon.ExtentsOffset = Vector3.new(0, 1, 0)
+							Icon.LightInfluence = 1.000
+							Icon.Size = UDim2.new(0, 800, 0, 50)
+ 
+							ESPText.Name = "ESP Text"
+							ESPText.Parent = Icon
+							ESPText.BackgroundColor3 = v.TeamColor.Color
+							ESPText.BackgroundTransparency = 1.000
+							ESPText.Size = UDim2.new(0, 800, 0, 50)
+							ESPText.Font = Enum.Font.SciFi
+							ESPText.Text = v[PlayerName]
+							ESPText.TextColor3 = v.TeamColor.Color
+							ESPText.TextSize = 14
+							ESPText.TextWrapped = true
+						else
+							if v.TeamColor ~= LP.TeamColor and v.Character:FindFirstChild("Totally NOT Esp") == nil and v.Character:FindFirstChild("Icon") == nil and getgenv().TC == true then
+ 
+ 
+								--//ESP-Text\\--
+								local Icon = Instance.new("BillboardGui", v.Character.HumanoidRootPart)
+								local ESPText = Instance.new("TextLabel")
+ 
+								Icon.Name = "Icon"
+								Icon.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+								Icon.Active = true
+								Icon.AlwaysOnTop = true
+								Icon.ExtentsOffset = Vector3.new(0, 1, 0)
+								Icon.LightInfluence = 1.000
+								Icon.Size = UDim2.new(0, 400, 0, 50)
+ 
+								ESPText.Name = "ESP Text"
+								ESPText.Parent = Icon
+								ESPText.BackgroundColor3 = v.TeamColor.Color
+								ESPText.BackgroundTransparency = 1.000
+								ESPText.Size = UDim2.new(0, 800, 0, 50)
+								ESPText.Font = Enum.Font.SciFi
+								ESPText.Text = v[PlayerName]
+								ESPText.TextColor3 = v.TeamColor.Color
+								ESPText.TextSize = 20
+								ESPText.TextWrapped = true
+							else
+								if not v.Character:FindFirstChild("Totally NOT Esp").FillColor == v.TeamColor.Color and not v.Character:FindFirstChild("Icon").TextColor3 == v.TeamColor.Color then
+									v.Character:FindFirstChild("Totally NOT Esp").FillColor = v.TeamColor.Color
+									v.Character:FindFirstChild("Icon").TextColor3 = v.TeamColor.Color
+								else
+									if v.Character:FindFirstChild("Totally NOT Esp").Enabled == false and v.Character:FindFirstChild("Icon").Enabled == false then
+										v.Character:FindFirstChild("Totally NOT Esp").Enabled = true
+										v.Character:FindFirstChild("Icon").Enabled = true
+									else
+										if v.Character:FindFirstChild("Icon") then
+											v.Character:FindFirstChild("Icon")["ESP Text"].Text = v[PlayerName]
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end)
+ 
+	wait()
+ 
+	DB = false
+end
+
+   end,
+})
+
+local VisualTab = Window:CreateTab("Visuals👁️", nil) -- Title, Image
+local Section = VisualTab:CreateSection("Visuals")
+
+
+local Button = VisualTab:CreateButton({
+   Name = "Nofog",
+   Callback = function()
+-- Function to remove fog
+local function removeFog()
+    local lighting = game:GetService("Lighting")
+    lighting.FogEnd = 1e10
+    lighting.FogStart = 1e10
+    lighting.FogColor = Color3.new(1, 1, 1) -- Optional: Set to desired color
+end
+
+-- Initial fog removal
+removeFog()
+
+-- Re-apply fog removal if Lighting properties change
+game:GetService("Lighting"):GetPropertyChangedSignal("FogEnd"):Connect(removeFog)
+game:GetService("Lighting"):GetPropertyChangedSignal("FogStart"):Connect(removeFog)
+game:GetService("Lighting"):GetPropertyChangedSignal("FogColor"):Connect(removeFog)
+
+-- Re-apply fog removal if Lighting service is changed
+game:GetService("Lighting").Changed:Connect(removeFog)
+
+-- Notification
+game.StarterGui:SetCore("SendNotification", {
+    Title = "No Fog Script Activated",
+    Text = "Fog has been removed from the game",
+    Duration = 5,
+})
+   end,
+})
+
+local Button = VisualTab:CreateButton({
+   Name = "NoShadows",
+   Callback = function()
+ -- Access the Lighting service
+local Lighting = game:GetService("Lighting")
+
+-- Remove shadows by changing the properties of the environment
+Lighting.ShadowSoftness = 0 -- Reduces the softness of the shadows, effectively removing them
+Lighting.GlobalShadows = false -- Disables global shadows
+
+-- Optionally, you can also adjust other lighting properties if needed
+Lighting.Ambient = Color3.fromRGB(255, 255, 255) -- Set ambient light to white
+Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255) -- Set outdoor ambient light to white
+
+   end,
+})
+
+local Button = VisualTab:CreateButton({
+   Name = "FullBright",
+   Callback = function()
+--just made a loadstring for my discord server, so i not made thi
+--https://discord.gg/7axk7UGS8C
+
+
+pcall(function()
+	local lighting = game:GetService("Lighting");
+	lighting.Ambient = Color3.fromRGB(255, 255, 255);
+	lighting.Brightness = 1;
+	lighting.FogEnd = 1e10;
+	for i, v in pairs(lighting:GetDescendants()) do
+		if v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("SunRaysEffect") then
+			v.Enabled = false;
+		end;
+	end;
+	lighting.Changed:Connect(function()
+		lighting.Ambient = Color3.fromRGB(255, 255, 255);
+		lighting.Brightness = 1;
+		lighting.FogEnd = 1e10;
+	end);
+	spawn(function()
+		local character = game:GetService("Players").LocalPlayer.Character;
+		while wait() do
+			repeat wait() until character ~= nil;
+			if not character.HumanoidRootPart:FindFirstChildWhichIsA("PointLight") then
+				local headlight = Instance.new("PointLight", character.HumanoidRootPart);
+				headlight.Brightness = 1;
+				headlight.Range = 60;
+			end;
+		end;
+	end);
+end)
+   end,
+})
